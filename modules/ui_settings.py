@@ -170,7 +170,16 @@ class UiSettings:
                     loadsave.create_ui()
 
                 with gr.TabItem("Sysinfo", id="sysinfo", elem_id="settings_tab_sysinfo"):
-                    gr.HTML('<a href="./internal/sysinfo-download" class="sysinfo_big_link" download>Download system info</a><br /><a href="./internal/sysinfo" target="_blank">(or open as text in a new page)</a>', elem_id="sysinfo_download")
+                    download_sysinfo = gr.Button(value='Download system info', elem_id="internal-download-sysinfo", visible=False)
+                    open_sysinfo = gr.Button(value='Open as text in a new page', elem_id="internal-open-sysinfo", visible=False)
+                    sysinfo_textbox = gr.Textbox('', elem_id='internal-sysinfo-textbox', interactive=False, visible=False)
+                    sysinfo_html = gr.HTML('''<a class="sysinfo_big_link" onclick="gradioApp().getElementById('internal-download-sysinfo').click();">Download system info</a><br/><a onclick="gradioApp().getElementById('internal-open-sysinfo').click();">(or open as text in a new page)</a>''', elem_id="sysinfo_download")
+
+                    def get_sysinfo():
+                        return sysinfo.get(), gr.update()
+
+                    download_sysinfo.click(fn=get_sysinfo, outputs=[sysinfo_textbox, sysinfo_html], show_progress=True).then(fn=None, _js='downloadSysinfo')
+                    open_sysinfo.click(fn=get_sysinfo, outputs=[sysinfo_textbox, sysinfo_html], show_progress=True).then(fn=None, _js='openTabSysinfo')
 
                     with gr.Row():
                         with gr.Column(scale=1):
